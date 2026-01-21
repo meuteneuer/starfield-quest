@@ -26,10 +26,10 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 20, 40, 0.85);
+            background: rgba(20, 15, 5, 0.85);
             padding: 20px 30px;
             border-radius: 15px;
-            border: 1px solid rgba(100, 100, 255, 0.3);
+            border: 1px solid rgba(255, 200, 100, 0.3);
             backdrop-filter: blur(10px);
             display: flex;
             gap: 25px;
@@ -53,7 +53,7 @@
         }
 
         .control-group label {
-            color: #aaccff;
+            color: #ffd700;
             font-size: 12px;
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -64,7 +64,7 @@
             width: 120px;
             height: 6px;
             -webkit-appearance: none;
-            background: rgba(100, 100, 255, 0.3);
+            background: rgba(255, 200, 100, 0.3);
             border-radius: 3px;
             outline: none;
         }
@@ -73,10 +73,10 @@
             -webkit-appearance: none;
             width: 16px;
             height: 16px;
-            background: #6699ff;
+            background: #ffd700;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(100, 150, 255, 0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
         }
 
         .control-group .value {
@@ -90,9 +90,9 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(20, 20, 40, 0.85);
-            border: 1px solid rgba(100, 100, 255, 0.3);
-            color: #aaccff;
+            background: rgba(20, 15, 5, 0.85);
+            border: 1px solid rgba(255, 200, 100, 0.3);
+            color: #ffd700;
             padding: 10px 20px;
             border-radius: 25px;
             cursor: pointer;
@@ -102,19 +102,14 @@
         }
 
         .toggle-btn:hover {
-            background: rgba(40, 40, 80, 0.9);
+            background: rgba(40, 30, 10, 0.9);
         }
     </style>
 </head>
 <body>
     <canvas id="starfield"></canvas>
 
-    <div class="controls" id="controls">
-        <div class="control-group">
-            <label>Star Count</label>
-            <input type="range" id="starCount" min="50" max="500" value="200">
-            <span class="value" id="starCountValue">200</span>
-        </div>
+    <div class="controls hidden" id="controls">
         <div class="control-group">
             <label>Speed</label>
             <input type="range" id="speed" min="1" max="20" value="5">
@@ -125,19 +120,9 @@
             <input type="range" id="trailLength" min="1" max="50" value="20">
             <span class="value" id="trailLengthValue">20</span>
         </div>
-        <div class="control-group">
-            <label>Star Size</label>
-            <input type="range" id="starSize" min="1" max="5" value="2" step="0.5">
-            <span class="value" id="starSizeValue">2</span>
-        </div>
-        <div class="control-group">
-            <label>Brightness</label>
-            <input type="range" id="brightness" min="0.3" max="1" value="0.8" step="0.1">
-            <span class="value" id="brightnessValue">0.8</span>
-        </div>
     </div>
 
-    <button class="toggle-btn" id="toggleBtn">Hide Controls</button>
+    <button class="toggle-btn" id="toggleBtn">Show Controls</button>
 
     <script>
         const canvas = document.getElementById('starfield');
@@ -157,7 +142,7 @@
             speed: 5,
             trailLength: 20,
             starSize: 2,
-            brightness: 0.8
+            brightness: 0.9
         };
 
         // Star class
@@ -216,7 +201,7 @@
             }
 
             draw() {
-                // Draw trail
+                // Draw trail with gold gradient
                 if (this.trail.length > 1) {
                     for (let i = 0; i < this.trail.length - 1; i++) {
                         const alpha = (i / this.trail.length) * params.brightness * 0.5;
@@ -224,25 +209,25 @@
 
                         ctx.beginPath();
                         ctx.arc(this.trail[i].x, this.trail[i].y, size, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                        ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
                         ctx.fill();
                     }
                 }
 
-                // Draw star
+                // Draw star in gold
                 const size = params.starSize * this.speedMultiplier * 1.5;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${params.brightness})`;
+                ctx.fillStyle = `rgba(255, 215, 0, ${params.brightness})`;
                 ctx.fill();
 
-                // Add glow effect
+                // Add gold glow effect
                 const gradient = ctx.createRadialGradient(
                     this.x, this.y, 0,
                     this.x, this.y, size * 3
                 );
-                gradient.addColorStop(0, `rgba(200, 220, 255, ${params.brightness * 0.5})`);
-                gradient.addColorStop(1, 'rgba(200, 220, 255, 0)');
+                gradient.addColorStop(0, `rgba(255, 215, 0, ${params.brightness * 0.5})`);
+                gradient.addColorStop(1, 'rgba(255, 180, 50, 0)');
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, size * 3, 0, Math.PI * 2);
                 ctx.fillStyle = gradient;
@@ -262,8 +247,8 @@
 
         // Animation loop
         function animate() {
-            // Create trail effect with semi-transparent background
-            ctx.fillStyle = 'rgba(0, 0, 10, 0.2)';
+            // Create trail effect with black background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Update and draw stars
@@ -278,27 +263,14 @@
 
         // Control handlers
         const controls = {
-            starCount: document.getElementById('starCount'),
             speed: document.getElementById('speed'),
-            trailLength: document.getElementById('trailLength'),
-            starSize: document.getElementById('starSize'),
-            brightness: document.getElementById('brightness')
+            trailLength: document.getElementById('trailLength')
         };
 
         const values = {
-            starCount: document.getElementById('starCountValue'),
             speed: document.getElementById('speedValue'),
-            trailLength: document.getElementById('trailLengthValue'),
-            starSize: document.getElementById('starSizeValue'),
-            brightness: document.getElementById('brightnessValue')
+            trailLength: document.getElementById('trailLengthValue')
         };
-
-        // Update functions
-        controls.starCount.addEventListener('input', (e) => {
-            params.starCount = parseInt(e.target.value);
-            values.starCount.textContent = params.starCount;
-            initStars();
-        });
 
         controls.speed.addEventListener('input', (e) => {
             params.speed = parseInt(e.target.value);
@@ -308,16 +280,6 @@
         controls.trailLength.addEventListener('input', (e) => {
             params.trailLength = parseInt(e.target.value);
             values.trailLength.textContent = params.trailLength;
-        });
-
-        controls.starSize.addEventListener('input', (e) => {
-            params.starSize = parseFloat(e.target.value);
-            values.starSize.textContent = params.starSize;
-        });
-
-        controls.brightness.addEventListener('input', (e) => {
-            params.brightness = parseFloat(e.target.value);
-            values.brightness.textContent = params.brightness;
         });
 
         // Toggle controls visibility
