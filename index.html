@@ -157,13 +157,18 @@
                 this.y = canvas.height / 2;
 
                 // Random angle for direction
-                const angle = Math.random() * Math.PI * 2;
+                this.angle = Math.random() * Math.PI * 2;
 
                 // Random speed multiplier for depth effect
                 this.speedMultiplier = Math.random() * 0.5 + 0.5;
 
-                this.vx = Math.cos(angle) * this.speedMultiplier;
-                this.vy = Math.sin(angle) * this.speedMultiplier;
+                // Slither parameters
+                this.slitherSpeed = Math.random() * 0.05 + 0.02;
+                this.slitherAmount = Math.random() * 0.03 + 0.01;
+                this.time = Math.random() * Math.PI * 2;
+
+                this.vx = Math.cos(this.angle) * this.speedMultiplier;
+                this.vy = Math.sin(this.angle) * this.speedMultiplier;
 
                 // Trail history
                 this.trail = [];
@@ -183,7 +188,17 @@
                     this.trail.shift();
                 }
 
-                // Move star outward with acceleration effect
+                // Update time for slithering motion
+                this.time += this.slitherSpeed;
+
+                // Add sinusoidal curve to the angle for slithering
+                this.angle += Math.sin(this.time) * this.slitherAmount;
+
+                // Update velocity based on new angle
+                this.vx = Math.cos(this.angle) * this.speedMultiplier;
+                this.vy = Math.sin(this.angle) * this.speedMultiplier;
+
+                // Move snake outward with acceleration effect
                 const distFromCenter = Math.sqrt(
                     Math.pow(this.x - canvas.width / 2, 2) +
                     Math.pow(this.y - canvas.height / 2, 2)
@@ -214,7 +229,7 @@
 
                         ctx.beginPath();
                         ctx.arc(this.trail[i].x, this.trail[i].y, size, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(${Math.floor(255 * scaleShade)}, ${Math.floor(180 * scaleShade)}, ${Math.floor(50 * scaleShade)}, ${alpha})`;
+                        ctx.fillStyle = `rgba(${Math.floor(50 * scaleShade)}, ${Math.floor(180 * scaleShade)}, ${Math.floor(50 * scaleShade)}, ${alpha})`;
                         ctx.fill();
                     }
                 }
@@ -223,11 +238,11 @@
                 const headSize = params.starSize * this.speedMultiplier * 3;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, headSize, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 215, 0, ${params.brightness})`;
+                ctx.fillStyle = `rgba(100, 220, 100, ${params.brightness})`;
                 ctx.fill();
 
                 // Draw eyes
-                const angle = Math.atan2(this.vy, this.vx);
+                const angle = this.angle;
                 const eyeOffset = headSize * 0.5;
                 const eyeSize = headSize * 0.25;
 
