@@ -201,37 +201,70 @@
             }
 
             draw() {
-                // Draw trail with gold gradient
+                // Draw snake body (segmented trail)
                 if (this.trail.length > 1) {
-                    for (let i = 0; i < this.trail.length - 1; i++) {
-                        const alpha = (i / this.trail.length) * params.brightness * 0.5;
-                        const size = (i / this.trail.length) * params.starSize * this.speedMultiplier;
+                    for (let i = 0; i < this.trail.length; i++) {
+                        const progress = i / this.trail.length;
+                        // Body gets thicker toward the head
+                        const size = (0.3 + progress * 0.7) * params.starSize * this.speedMultiplier * 2;
+                        const alpha = (0.4 + progress * 0.6) * params.brightness;
+
+                        // Alternating scale pattern
+                        const scaleShade = (i % 2 === 0) ? 1 : 0.7;
 
                         ctx.beginPath();
                         ctx.arc(this.trail[i].x, this.trail[i].y, size, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
+                        ctx.fillStyle = `rgba(${Math.floor(255 * scaleShade)}, ${Math.floor(180 * scaleShade)}, ${Math.floor(50 * scaleShade)}, ${alpha})`;
                         ctx.fill();
                     }
                 }
 
-                // Draw star in gold
-                const size = params.starSize * this.speedMultiplier * 1.5;
+                // Draw snake head (larger, brighter)
+                const headSize = params.starSize * this.speedMultiplier * 3;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+                ctx.arc(this.x, this.y, headSize, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255, 215, 0, ${params.brightness})`;
                 ctx.fill();
 
-                // Add gold glow effect
-                const gradient = ctx.createRadialGradient(
-                    this.x, this.y, 0,
-                    this.x, this.y, size * 3
-                );
-                gradient.addColorStop(0, `rgba(255, 215, 0, ${params.brightness * 0.5})`);
-                gradient.addColorStop(1, 'rgba(255, 180, 50, 0)');
+                // Draw eyes
+                const angle = Math.atan2(this.vy, this.vx);
+                const eyeOffset = headSize * 0.5;
+                const eyeSize = headSize * 0.25;
+
+                // Left eye
+                const leftEyeX = this.x + Math.cos(angle - 0.5) * eyeOffset;
+                const leftEyeY = this.y + Math.sin(angle - 0.5) * eyeOffset;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, size * 3, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
+                ctx.arc(leftEyeX, leftEyeY, eyeSize, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
                 ctx.fill();
+
+                // Right eye
+                const rightEyeX = this.x + Math.cos(angle + 0.5) * eyeOffset;
+                const rightEyeY = this.y + Math.sin(angle + 0.5) * eyeOffset;
+                ctx.beginPath();
+                ctx.arc(rightEyeX, rightEyeY, eyeSize, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
+                ctx.fill();
+
+                // Forked tongue (occasionally flickers)
+                if (Math.random() > 0.7) {
+                    const tongueLength = headSize * 1.5;
+                    const tongueX = this.x + Math.cos(angle) * headSize;
+                    const tongueY = this.y + Math.sin(angle) * headSize;
+
+                    ctx.strokeStyle = '#ff3333';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(tongueX, tongueY);
+                    ctx.lineTo(tongueX + Math.cos(angle) * tongueLength, tongueY + Math.sin(angle) * tongueLength);
+                    // Fork
+                    ctx.moveTo(tongueX + Math.cos(angle) * tongueLength * 0.7, tongueY + Math.sin(angle) * tongueLength * 0.7);
+                    ctx.lineTo(tongueX + Math.cos(angle - 0.3) * tongueLength, tongueY + Math.sin(angle - 0.3) * tongueLength);
+                    ctx.moveTo(tongueX + Math.cos(angle) * tongueLength * 0.7, tongueY + Math.sin(angle) * tongueLength * 0.7);
+                    ctx.lineTo(tongueX + Math.cos(angle + 0.3) * tongueLength, tongueY + Math.sin(angle + 0.3) * tongueLength);
+                    ctx.stroke();
+                }
             }
         }
 
